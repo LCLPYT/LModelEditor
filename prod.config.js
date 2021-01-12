@@ -45,4 +45,7 @@ module.exports = {
     resolve: {
         extensions: [ '.ts', '.js' ]
     },
+    externals: {
+        three: 'THREE'
+    }
 };
