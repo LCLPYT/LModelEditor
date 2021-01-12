@@ -1,0 +1,29 @@
+{
+  "name": "lmodeleditor",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack",
+    "build": "webpack --config prod.config.js",
+    "start": "webpack serve --open"
+  },
+  "author": "LCLP",
+  "license": "MIT",
+  "devDependencies": {
+    "css-loader": "^5.0.1",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^4.5.1",
+    "source-map-loader": "^2.0.0",
+    "style-loader": "^2.0.0",
+    "ts-loader": "^8.0.14",
+    "typescript": "^4.1.3",
+    "webpack": "^5.13.0",
+    "webpack-cli": "^4.3.1",
+    "webpack-dev-server": "^3.11.1"
+  },
+  "dependencies": {
+    "three": "^0.124.0"
+  }
+}
