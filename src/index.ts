@@ -5,7 +5,7 @@ import { camera, fitCameraToWindow, initScene, populateScene, scene } from './ts
 import { initRenderer, canvas, renderer, render } from './ts/render';
 
 initScene();
-initRenderer();
+initRenderer(scene, camera);
 initControls(canvas, camera, scene);
 
 window.addEventListener('resize', () => {
