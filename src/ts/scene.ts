@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Cube } from './data/Cube';
 import { LModel } from './data/LModel';
 import { ModelRenderer } from './data/ModelRenderer';
-import { getDefaultModel } from './loader';
+import { fetchJson, getDefaultModel, loadModelFromJson } from './loader';
 import { setSelectedObjects } from './render';
 
 export let scene: THREE.Scene;
@@ -39,6 +39,16 @@ export function populateScene() {
     scene.add(new THREE.GridHelper(10, 10, 0x888888, 0x444444));
 
     loadModel(getDefaultModel());
+    fetchJson('resource/creeper.json', (status, response) => {
+        if(status !== 200) {
+            console.error("An error occured. HTTP " + status);
+            return;
+        }
+
+        let model = <LModel> response;
+        console.log(model);
+        loadModel(model);
+    });
 }
 
 function loadModel(model: LModel) {
