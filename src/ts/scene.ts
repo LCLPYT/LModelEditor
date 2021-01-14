@@ -43,7 +43,7 @@ export function populateScene() {
     scene.add(new THREE.GridHelper(16, 16, 0x888888, 0x444444));
 
     // loadModel(getDefaultModel());
-    fetchJson('resource/dummy.json', (status, response) => {
+    fetchJson('resource/creeper.json', (status, response) => {
         if(status !== 200) {
             console.error("An error occured. HTTP " + status);
             return;
@@ -55,27 +55,46 @@ export function populateScene() {
 }
 
 function loadModel(model: LModel) {
-    model.renderers.forEach(addRenderer);
+    if(model.initialTranslation === undefined) model.initialTranslation = new THREE.Vector3(0, -1.5, 0);
+    model.renderers.forEach(r => addRenderer(r, model));
 }
 
-function addRenderer(renderer: ModelRenderer) {
-    renderer.children.forEach(addRenderer);
-    renderer.cubes.forEach(cube => addCube(cube, renderer));
+function addRenderer(renderer: ModelRenderer, model: LModel) {
+    renderer.children.forEach(r => addRenderer(r, model));
+    renderer.cubes.forEach(cube => addCube(cube, renderer, model));
+
+    const rotPoint = new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 32), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+    rotPoint.position.set(
+        // axis direction           | initial offset
+        ( renderer.rotationPoint.x) + ( model.initialTranslation.x * 16),
+        (-renderer.rotationPoint.y) + (-model.initialTranslation.y * 16),
+        (-renderer.rotationPoint.z) + (-model.initialTranslation.z * 16)
+    );
+
+    scene.add(rotPoint);
 }
 
-function addCube(cube: Cube, renderer: ModelRenderer) {
+function addCube(cube: Cube, renderer: ModelRenderer, model: LModel) {
     const geometry = new THREE.BoxGeometry(cube.dimensions.x, cube.dimensions.y, cube.dimensions.z);
     const material = new THREE.MeshStandardMaterial({
         color: 0xaaaaaa
     });
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.copy(fixCubeCoordinates(convertCoordinates(cube.position), cube.dimensions)).add(fixRotationPoint(convertCoordinates(renderer.rotationPoint)));
+    mesh.position.set(
+        // axis direction  |  cube center to begin vertex  | offset correction
+        ( cube.position.x) + (cube.dimensions.x / 2 - 0.5) + (0.5),
+        (-cube.position.y) - (cube.dimensions.y / 2 + 0.5) + (0.5),
+        (-cube.position.z) - (cube.dimensions.z / 2 - 0.5) - (0.5)
+    );
 
     let pivotPoint = new THREE.Vector3(
-        mesh.position.x - cube.dimensions.x / 2,
-        mesh.position.y - cube.dimensions.y / 2,
-        mesh.position.z + cube.dimensions.z / 2
+        // axis direction           | initial offset
+        ( renderer.rotationPoint.x) + ( model.initialTranslation.x * 16),
+        (-renderer.rotationPoint.y) + (-model.initialTranslation.y * 16),
+        (-renderer.rotationPoint.z) + (-model.initialTranslation.z * 16)
     );
+
+    mesh.position.add(pivotPoint);
 
     const eulerRotation = new THREE.Euler(
         renderer.rotation.x,
@@ -92,30 +111,6 @@ function addCube(cube: Cube, renderer: ModelRenderer) {
 
     scene.add(mesh);
     objects.push(mesh);
-}
-
-function fixCubeCoordinates(vec: THREE.Vector3, dimensions: THREE.Vector3): THREE.Vector3 {
-    return new THREE.Vector3(
-        vec.x + dimensions.x / 2 - 0.5,
-        vec.y - dimensions.y / 2 + 0.5,
-        vec.z - dimensions.z / 2 - 0.5
-    );
-}
-
-function convertCoordinates(vec: THREE.Vector3): THREE.Vector3 {
-    return new THREE.Vector3(
-        vec.x + 0.25, 
-        -vec.y, 
-        -vec.z + 0.25
-    );
-}
-
-function fixRotationPoint(vec: THREE.Vector3): THREE.Vector3 {
-    return new THREE.Vector3(
-        vec.x,
-        vec.y + 23.5,
-        vec.z
-    );
 }
 
 export function setSelected(obj: THREE.Object3D, reset: boolean) {
