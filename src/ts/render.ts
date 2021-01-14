@@ -12,7 +12,8 @@ export let renderer: THREE.WebGLRenderer;
 export let canvas: HTMLCanvasElement;
 let composer: EffectComposer;
 let effectFXAA: ShaderPass;
-let outlinePass: OutlinePass;
+let outlinePassSelected: OutlinePass;
+let outlinePassSelectable: OutlinePass;
 
 export function initRenderer(scene: THREE.Scene, camera: THREE.Camera) {
     renderer = new THREE.WebGLRenderer({
@@ -28,9 +29,13 @@ export function initRenderer(scene: THREE.Scene, camera: THREE.Camera) {
     const renderPass = new RenderPass(scene, camera);
     composer.addPass(renderPass);
 
-    outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
-    outlinePass.visibleEdgeColor = new THREE.Color(0xeb8909);
-    composer.addPass(outlinePass);
+    outlinePassSelected = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
+    outlinePassSelected.visibleEdgeColor = new THREE.Color(0xeb8909);
+    composer.addPass(outlinePassSelected);
+
+    outlinePassSelectable = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
+    outlinePassSelectable.visibleEdgeColor = new THREE.Color(0xdddddd);
+    composer.addPass(outlinePassSelectable);
 
     effectFXAA = new ShaderPass(FXAAShader);
     effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
@@ -53,5 +58,23 @@ export function render() {
 }
 
 export function setSelectedObjects(objects: Object3D[]) {
-    outlinePass.selectedObjects = objects;
+    let toRemove = [];
+    outlinePassSelectable.selectedObjects.forEach(o => {
+        let idx = objects.indexOf(o);
+        if(idx != -1) toRemove.push(idx);
+    });
+    toRemove.forEach(i => outlinePassSelectable.selectedObjects.splice(i, 1));
+
+    outlinePassSelected.selectedObjects = objects;
+}
+
+export function setSelectableObjects(objects: Object3D[]) {
+    let toRemove = [];
+    outlinePassSelected.selectedObjects.forEach(o => {
+        let idx = objects.indexOf(o);
+        if(idx != -1) toRemove.push(idx);
+    });
+    toRemove.forEach(i => objects.splice(i, 1));
+
+    outlinePassSelectable.selectedObjects = objects;
 }

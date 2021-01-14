@@ -1,13 +1,14 @@
 import * as THREE from 'three';
 import { OrbitControls } from '../../node_modules/three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from '../../node_modules/three/examples/jsm/controls/TransformControls';
-import { objects, setSelected } from './scene';
+import { objects, setSelectable, setSelected } from './scene';
 
 let orbitControls: OrbitControls;
 let transformControls: TransformControls;
 let rayCaster: THREE.Raycaster;
 let mouse: THREE.Vector2;
 let objectsTransformControl = [];
+let mouseDownPointer: THREE.Vector2 = new THREE.Vector2(0, 0);
 
 export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, scene: THREE.Scene) {
     orbitControls = new OrbitControls(camera, canvas);
@@ -52,11 +53,18 @@ export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, sc
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-        checkIntersections(camera, false);
+        checkIntersections(camera, false, false);
     }, false);
     canvas.addEventListener('pointerdown', event => {
-        checkIntersections(camera, true);
+        mouseDownPointer.set(event.clientX, event.clientY);
+        checkIntersections(camera, true, true);
     }, false);
+    canvas.addEventListener('pointerup', event => {
+        const dx = event.clientX - mouseDownPointer.x, dy = event.clientY - mouseDownPointer.y;
+        if(dx * dx + dy * dy <= 1) { // camera didn't move
+            checkIntersections(camera, true, false);
+        }
+    });
 }
 
 export function updateControls() {
@@ -64,26 +72,28 @@ export function updateControls() {
     orbitControls.update();
 }
 
-function checkIntersections(camera: THREE.Camera, clicked: boolean) {
+function checkIntersections(camera: THREE.Camera, clicked: boolean, clickDown: boolean) {
     rayCaster.setFromCamera(mouse, camera);
 
     const intersects = rayCaster.intersectObjects(objects);
     if (intersects.length > 0) {
         const selected = intersects[0].object;
-        setSelected(selected, true);
-        if(clicked) select(selected);
+        setSelectable(selected, true);
+        if(clicked && clickDown && !transformControls.dragging) select(selected);
     } else {
         if(transformControls.axis !== null) return;
-        setSelected(null, true);
-        if(clicked) selectNothing();
+        setSelectable(null, true);
+        if(clicked && !clickDown) selectNothing();
     }
 }
 
 function select(obj: THREE.Object3D) {
+    setSelected(obj, true);
     transformControls.attach(obj);
 }
 
 function selectNothing() {
+    setSelected(null, true);
     transformControls.detach();
 }
 

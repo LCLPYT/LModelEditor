@@ -3,7 +3,7 @@ import { Cube } from './data/Cube';
 import { LModel } from './data/LModel';
 import { ModelRenderer } from './data/ModelRenderer';
 import { convertModelToJson, fetchJson, getDefaultModel, loadModelFromJson } from './loader';
-import { setSelectedObjects } from './render';
+import { setSelectableObjects, setSelectedObjects } from './render';
 
 export let scene: THREE.Scene;
 export let camera: THREE.PerspectiveCamera;
@@ -20,6 +20,7 @@ export function initScene() {
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(-2.5, 2, 3.75);
+    scene.add(camera);
 }
 
 export function fitCameraToWindow() {
@@ -37,8 +38,9 @@ export function populateScene() {
     scene.add(ambientLight);
     
     const light = new THREE.PointLight(0xffffff, 0.7);
-    light.position.set(5, 7, 10);
-    scene.add(light);
+    // light.position.set(5, 7, 10);
+    light.position.set(0, 1, 0);
+    camera.add(light);
 
     scene.add(new THREE.GridHelper(16, 16, 0x888888, 0x444444));
 
@@ -117,4 +119,10 @@ export function setSelected(obj: THREE.Object3D, reset: boolean) {
     if(reset) selectedObjects = [];
     if(obj != null) selectedObjects.push(obj);
     setSelectedObjects(selectedObjects);
+}
+
+export function setSelectable(obj: THREE.Object3D, reset: boolean) {
+    if(reset) selectedObjects = [];
+    if(obj != null) selectedObjects.push(obj);
+    setSelectableObjects(selectedObjects);
 }
