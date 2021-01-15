@@ -1,1 +1,237 @@
-{"name":"creeper","renderers":[{"name":"Entity Part","cubes":[{"position":{"x":-4.0,"y":-8.0,"z":-4.0},"dimensions":{"x":8.0,"y":8.0,"z":8.0},"delta":{"x":0.0,"y":0.0,"z":0.0},"mirror":false,"texture":{"offetX":0,"offsetY":0,"width":64.0,"height":32.0}}],"children":[],"rotationPoint":{"x":0.0,"y":6.0,"z":0.0},"rotation":{"x":0.0,"y":0.0,"z":0.0},"visible":true},{"name":"Entity Part","cubes":[{"position":{"x":-4.0,"y":0.0,"z":-2.0},"dimensions":{"x":8.0,"y":12.0,"z":4.0},"delta":{"x":0.0,"y":0.0,"z":0.0},"mirror":false,"texture":{"offetX":16,"offsetY":16,"width":64.0,"height":32.0}}],"children":[],"rotationPoint":{"x":0.0,"y":6.0,"z":0.0},"rotation":{"x":0.0,"y":0.0,"z":0.0},"visible":true},{"name":"Entity Part","cubes":[{"position":{"x":-2.0,"y":0.0,"z":-2.0},"dimensions":{"x":4.0,"y":6.0,"z":4.0},"delta":{"x":0.0,"y":0.0,"z":0.0},"mirror":false,"texture":{"offetX":0,"offsetY":16,"width":64.0,"height":32.0}}],"children":[],"rotationPoint":{"x":-2.0,"y":18.0,"z":4.0},"rotation":{"x":0.0,"y":0.0,"z":0.0},"visible":true},{"name":"Entity Part","cubes":[{"position":{"x":-2.0,"y":0.0,"z":-2.0},"dimensions":{"x":4.0,"y":6.0,"z":4.0},"delta":{"x":0.0,"y":0.0,"z":0.0},"mirror":false,"texture":{"offetX":0,"offsetY":16,"width":64.0,"height":32.0}}],"children":[],"rotationPoint":{"x":2.0,"y":18.0,"z":4.0},"rotation":{"x":0.0,"y":0.0,"z":0.0},"visible":true},{"name":"Entity Part","cubes":[{"position":{"x":-2.0,"y":0.0,"z":-2.0},"dimensions":{"x":4.0,"y":6.0,"z":4.0},"delta":{"x":0.0,"y":0.0,"z":0.0},"mirror":false,"texture":{"offetX":0,"offsetY":16,"width":64.0,"height":32.0}}],"children":[],"rotationPoint":{"x":-2.0,"y":18.0,"z":-4.0},"rotation":{"x":0.0,"y":0.0,"z":0.0},"visible":true},{"name":"Entity Part","cubes":[{"position":{"x":-2.0,"y":0.0,"z":-2.0},"dimensions":{"x":4.0,"y":6.0,"z":4.0},"delta":{"x":0.0,"y":0.0,"z":0.0},"mirror":false,"texture":{"offetX":0,"offsetY":16,"width":64.0,"height":32.0}}],"children":[],"rotationPoint":{"x":2.0,"y":18.0,"z":-4.0},"rotation":{"x":0.0,"y":0.0,"z":0.0},"visible":true}],"initialTranslation":{"x":0.0,"y":-1.5,"z":0.0}}
+{
+    "name": "creeper",
+    "renderers": [{
+        "name": "Entity Part",
+        "cubes": [{
+            "position": {
+                "x": -4.0,
+                "y": -8.0,
+                "z": -4.0
+            },
+            "dimensions": {
+                "x": 8.0,
+                "y": 8.0,
+                "z": 8.0
+            },
+            "delta": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "mirror": false,
+            "texture": {
+                "offsetX": 0,
+                "offsetY": 0,
+                "width": 64.0,
+                "height": 32.0
+            }
+        }],
+        "children": [],
+        "rotationPoint": {
+            "x": 0.0,
+            "y": 6.0,
+            "z": 0.0
+        },
+        "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "visible": true
+    }, {
+        "name": "Entity Part",
+        "cubes": [{
+            "position": {
+                "x": -4.0,
+                "y": 0.0,
+                "z": -2.0
+            },
+            "dimensions": {
+                "x": 8.0,
+                "y": 12.0,
+                "z": 4.0
+            },
+            "delta": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "mirror": false,
+            "texture": {
+                "offsetX": 16,
+                "offsetY": 16,
+                "width": 64.0,
+                "height": 32.0
+            }
+        }],
+        "children": [],
+        "rotationPoint": {
+            "x": 0.0,
+            "y": 6.0,
+            "z": 0.0
+        },
+        "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "visible": true
+    }, {
+        "name": "Entity Part",
+        "cubes": [{
+            "position": {
+                "x": -2.0,
+                "y": 0.0,
+                "z": -2.0
+            },
+            "dimensions": {
+                "x": 4.0,
+                "y": 6.0,
+                "z": 4.0
+            },
+            "delta": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "mirror": false,
+            "texture": {
+                "offsetX": 0,
+                "offsetY": 16,
+                "width": 64.0,
+                "height": 32.0
+            }
+        }],
+        "children": [],
+        "rotationPoint": {
+            "x": -2.0,
+            "y": 18.0,
+            "z": 4.0
+        },
+        "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "visible": true
+    }, {
+        "name": "Entity Part",
+        "cubes": [{
+            "position": {
+                "x": -2.0,
+                "y": 0.0,
+                "z": -2.0
+            },
+            "dimensions": {
+                "x": 4.0,
+                "y": 6.0,
+                "z": 4.0
+            },
+            "delta": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "mirror": false,
+            "texture": {
+                "offsetX": 0,
+                "offsetY": 16,
+                "width": 64.0,
+                "height": 32.0
+            }
+        }],
+        "children": [],
+        "rotationPoint": {
+            "x": 2.0,
+            "y": 18.0,
+            "z": 4.0
+        },
+        "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "visible": true
+    }, {
+        "name": "Entity Part",
+        "cubes": [{
+            "position": {
+                "x": -2.0,
+                "y": 0.0,
+                "z": -2.0
+            },
+            "dimensions": {
+                "x": 4.0,
+                "y": 6.0,
+                "z": 4.0
+            },
+            "delta": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "mirror": false,
+            "texture": {
+                "offsetX": 0,
+                "offsetY": 16,
+                "width": 64.0,
+                "height": 32.0
+            }
+        }],
+        "children": [],
+        "rotationPoint": {
+            "x": -2.0,
+            "y": 18.0,
+            "z": -4.0
+        },
+        "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "visible": true
+    }, {
+        "name": "Entity Part",
+        "cubes": [{
+            "position": {
+                "x": -2.0,
+                "y": 0.0,
+                "z": -2.0
+            },
+            "dimensions": {
+                "x": 4.0,
+                "y": 6.0,
+                "z": 4.0
+            },
+            "delta": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "mirror": false,
+            "texture": {
+                "offsetX": 0,
+                "offsetY": 16,
+                "width": 64.0,
+                "height": 32.0
+            }
+        }],
+        "children": [],
+        "rotationPoint": {
+            "x": 2.0,
+            "y": 18.0,
+            "z": -4.0
+        },
+        "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "visible": true
+    }],
+    "initialTranslation": {
+        "x": 0.0,
+        "y": -1.5,
+        "z": 0.0
+    }
+}
