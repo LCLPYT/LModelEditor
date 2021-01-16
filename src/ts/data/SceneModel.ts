@@ -1,6 +1,6 @@
 import { BoxGeometry, DoubleSide, Euler, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, Scene, SphereGeometry, Texture, Vector2, Vector3 } from "three";
 import { setCubeUVs } from "../helper";
-import { fetchJson, isTextureSource, loadSkinToCanvas, loadImage } from "../loader";
+import { fetchJson, isTextureSource, loadSkinToCanvas, loadImage, loadModelFromJson } from "../loader";
 import { RemoteResource, TextureSource } from "../types";
 import { Cube } from "./Cube";
 import { LModel } from "./LModel";
@@ -32,8 +32,7 @@ export class SceneModel extends Group {
             if (result.status !== 200)
                 throw new Error(`An error occured. (HTTP ${result.status}, ${result.response})`);
             
-            let m = <LModel> result.response;
-            Object.setPrototypeOf(m, LModel.prototype);
+            let m = loadModelFromJson(result.response);
             return await this.loadModel(m);
         } else {
             throw new Error(`Unexpected type ${typeof model}`);

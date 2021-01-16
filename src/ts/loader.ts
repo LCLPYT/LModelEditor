@@ -1,16 +1,17 @@
-import { Texture, Vector2, Vector3 } from "three";
-import { Cube } from "./data/Cube";
-import { CubeTexture } from "./data/CubeTexture";
 import { LModel } from "./data/LModel";
-import { ModelRenderer } from "./data/ModelRenderer";
 import { RemoteResource, TextureCanvas, TextureSource, XHRResult } from "./types";
 
 export function convertModelToJson(model: LModel) {
     return JSON.stringify(model);
 }
 
-export function loadModelFromJson(json: string): LModel {
-    return JSON.parse(json);
+export function loadModelFromJson(json: string | object): LModel {
+    let model: LModel;
+    if (typeof json === "string") model = <LModel> JSON.parse(json);
+    else model = <LModel> json;
+    
+    Object.setPrototypeOf(model, LModel.prototype);
+    return model;
 }
 
 export function fetchJson(url: string): Promise<XHRResult> {
