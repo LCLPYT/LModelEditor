@@ -14,15 +14,15 @@ export function setUVs(box: BoxGeometry, u: number, v: number, width: number, he
 		new Vector2(x2 / textureWidth, 1.0 - y2 / textureHeight),
 		new Vector2(x2 / textureWidth, 1.0 - y1 / textureHeight),
 		new Vector2(x1 / textureWidth, 1.0 - y1 / textureHeight)
-    ];
-    
+	];
+	
 	const top = toFaceVertices(u + depth, v, u + width + depth, v + depth);
 	const bottom = toFaceVertices(u + width + depth, v, u + width * 2 + depth, v + depth);
 	const left = toFaceVertices(u, v + depth, u + depth, v + depth + height);
 	const front = toFaceVertices(u + depth, v + depth, u + width + depth, v + depth + height);
 	const right = toFaceVertices(u + width + depth, v + depth, u + width + depth * 2, v + height + depth);
-    const back = toFaceVertices(u + width + depth * 2, v + depth, u + width * 2 + depth * 2, v + height + depth);
-    
+	const back = toFaceVertices(u + width + depth * 2, v + depth, u + width * 2 + depth * 2, v + height + depth);
+
 	box.faceVertexUvs[0] = [
 		[right[3], right[0], right[2]],
 		[right[0], right[1], right[2]],
