@@ -1,7 +1,4 @@
 import * as THREE from 'three';
-import { Cube } from './data/Cube';
-import { LModel } from './data/LModel';
-import { ModelRenderer } from './data/ModelRenderer';
 import { SceneModel } from './data/SceneModel';
 import { setSelectableObjects, setSelectedObjects } from './render';
 
@@ -9,7 +6,7 @@ export let scene: THREE.Scene;
 export let camera: THREE.PerspectiveCamera;
 export let objects: THREE.Object3D[] = [];
 let selectedObjects: THREE.Object3D[] = [];
-let model: LModel;
+let models: SceneModel[] = [];
 
 export const AXIS_X = new THREE.Vector3(1, 0, 0);
 export const AXIS_Y = new THREE.Vector3(0, 1, 0);
@@ -62,6 +59,12 @@ function addModel(modelName: string) {
     }).catch(error => {
         console.error("Error loading model: ", error)
     });
+
+    models.push(sceneModel);
+}
+
+export function changeMaterial(standard: boolean) {
+    models.forEach(model => model.changeMaterial(standard));
 }
 
 export function setSelected(obj: THREE.Object3D, reset: boolean) {

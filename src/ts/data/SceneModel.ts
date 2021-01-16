@@ -1,4 +1,4 @@
-import { BoxGeometry, DoubleSide, Euler, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, Scene, SphereGeometry, Texture, Vector2, Vector3 } from "three";
+import { BoxGeometry, DoubleSide, Euler, Group, Mesh, MeshBasicMaterial, MeshBasicMaterialParameters, MeshStandardMaterial, MeshStandardMaterialParameters, NearestFilter, Object3D, Scene, SphereGeometry, Texture, Vector2, Vector3 } from "three";
 import { setCubeUVs } from "../helper";
 import { fetchJson, isTextureSource, loadSkinToCanvas, loadImage, loadModelFromJson } from "../loader";
 import { RemoteResource, TextureSource } from "../types";
@@ -69,19 +69,20 @@ export class SceneModel extends Group {
         this.add(rotPoint);
     }
 
-    private addCube(cube: Cube, renderer: ModelRenderer) {
-        const geometry = new BoxGeometry(cube.dimensions.x, cube.dimensions.y, cube.dimensions.z);
-        setCubeUVs(geometry, cube);
-    
-        const material = new MeshStandardMaterial({
+    protected getMaterialOptions(): MeshStandardMaterialParameters | MeshBasicMaterialParameters {
+        return {
             map: this.texture,
             side: DoubleSide,
             transparent: true,
             alphaTest: 1e-5
-        });
-        // const material = new THREE.MeshStandardMaterial({
-        //     color: 0xaaaaaa
-        // });
+        };
+    }
+
+    private addCube(cube: Cube, renderer: ModelRenderer) {
+        const geometry = new BoxGeometry(cube.dimensions.x, cube.dimensions.y, cube.dimensions.z);
+        setCubeUVs(geometry, cube);
+    
+        const material = new MeshStandardMaterial(this.getMaterialOptions());
         const mesh = new Mesh(geometry, material);
         mesh.position.set(
             // axis direction  |  cube center to begin vertex  | offset correction
@@ -109,6 +110,16 @@ export class SceneModel extends Group {
     
         this.add(mesh);
         this.activeObjects.push(mesh);
+    }
+
+    changeMaterial(standard: boolean) {
+        this.activeObjects.forEach(o => {
+            if(!(o instanceof Mesh)) return;
+            let mesh = <Mesh> o;
+
+            const material = standard ? new MeshStandardMaterial(this.getMaterialOptions()) : new MeshBasicMaterial(this.getMaterialOptions());
+            mesh.material = material;
+        });
     }
 
     getPivotPoint(renderer: ModelRenderer) {
