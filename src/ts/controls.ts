@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from '../../node_modules/three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from '../../node_modules/three/examples/jsm/controls/TransformControls';
+import { Bootstrap } from '../js/bootstrap';
 import { objects, setSelectable, setSelected, models } from './scene';
 
 let orbitControls: OrbitControls;
@@ -30,6 +31,7 @@ export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, sc
     let exportBtn = <HTMLButtonElement> document.getElementById('export-btn');
     exportBtn.addEventListener('click', () => {
         models[0].updateModel();
+        Bootstrap.openModal('modalExport');
     });
 
     window.addEventListener('keydown', event => {

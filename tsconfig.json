@@ -2,10 +2,7 @@
     "compilerOptions": {
         "outDir": "./dist",
         "allowJs": true,
-        "target": "es5",
-        "paths": {
-            "node_modules/three/examples/jsm/libs/dat.gui.module": ["./node_modules/@types/dat.gui"]
-        }
+        "target": "es5"
     },
     "include": [
         "./src/**/*"
