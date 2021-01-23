@@ -1,8 +1,9 @@
 import { LModel } from "./data/LModel";
 import { RemoteResource, TextureCanvas, TextureSource, XHRResult } from "./types";
 
-export function convertModelToJson(model: LModel) {
-    return JSON.stringify(model);
+export function convertModelToJson(model: LModel, pretty: boolean) {
+    if (pretty) return JSON.stringify(model, null, 2);
+    else return JSON.stringify(model);
 }
 
 export function loadModelFromJson(json: string | object): LModel {

@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import { OrbitControls } from '../../node_modules/three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from '../../node_modules/three/examples/jsm/controls/TransformControls';
 import { Bootstrap } from '../js/bootstrap';
+import { Highlight } from '../js/Highlight';
+import { copyTextToClipboard, selectElement } from './helper';
+import { convertModelToJson } from './loader';
 import { objects, setSelectable, setSelected, models } from './scene';
 
 let orbitControls: OrbitControls;
@@ -32,6 +35,24 @@ export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, sc
     exportBtn.addEventListener('click', () => {
         models[0].updateModel();
         Bootstrap.openModal('modalExport');
+    });
+
+    const jsonRaw = <HTMLElement> document.getElementById('jsonRaw');
+    let exportShowJson = <HTMLAnchorElement> document.getElementById('exportShowJson');
+    exportShowJson.addEventListener('click', event => {
+        event.preventDefault();
+        Bootstrap.closeModal('modalExport');
+        
+        jsonRaw.innerHTML = convertModelToJson(models[0].model, true);
+        Highlight.highlight(jsonRaw);
+
+        Bootstrap.openModal('modalJsonRaw');
+    });
+
+    const jsonRawCopy = <HTMLButtonElement> document.getElementById('jsonRawCopy');
+    jsonRawCopy.addEventListener('click', () => {
+        copyTextToClipboard(convertModelToJson(models[0].model, false));
+        selectElement(jsonRaw);
     });
 
     window.addEventListener('keydown', event => {
