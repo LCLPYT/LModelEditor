@@ -3,7 +3,7 @@ import { OrbitControls } from '../../node_modules/three/examples/jsm/controls/Or
 import { TransformControls } from '../../node_modules/three/examples/jsm/controls/TransformControls';
 import { Bootstrap } from '../js/bootstrap';
 import { Highlight } from '../js/Highlight';
-import { copyTextToClipboard, selectElement } from './helper';
+import { copyTextToClipboard, downloadModelJson, downloadText, selectElement } from './helper';
 import { convertModelToJson } from './loader';
 import { objects, setSelectable, setSelected, models } from './scene';
 
@@ -31,29 +31,7 @@ export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, sc
     rayCaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
 
-    let exportBtn = <HTMLButtonElement> document.getElementById('export-btn');
-    exportBtn.addEventListener('click', () => {
-        models[0].updateModel();
-        Bootstrap.openModal('modalExport');
-    });
-
-    const jsonRaw = <HTMLElement> document.getElementById('jsonRaw');
-    let exportShowJson = <HTMLAnchorElement> document.getElementById('exportShowJson');
-    exportShowJson.addEventListener('click', event => {
-        event.preventDefault();
-        Bootstrap.closeModal('modalExport');
-        
-        jsonRaw.innerHTML = convertModelToJson(models[0].model, true);
-        Highlight.highlight(jsonRaw);
-
-        Bootstrap.openModal('modalJsonRaw');
-    });
-
-    const jsonRawCopy = <HTMLButtonElement> document.getElementById('jsonRawCopy');
-    jsonRawCopy.addEventListener('click', () => {
-        copyTextToClipboard(convertModelToJson(models[0].model, false));
-        selectElement(jsonRaw);
-    });
+    registerUIListeners();
 
     window.addEventListener('keydown', event => {
         if(event.defaultPrevented) return;
@@ -93,6 +71,42 @@ export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, sc
         if(dx * dx + dy * dy <= 1) { // camera didn't move
             checkIntersections(camera, true, false);
         }
+    });
+}
+
+function registerUIListeners() {
+    let exportBtn = <HTMLButtonElement> document.getElementById('export-btn');
+    exportBtn.addEventListener('click', () => {
+        models[0].updateModel();
+        Bootstrap.openModal('modalExport');
+    });
+
+    const jsonRaw = <HTMLElement> document.getElementById('jsonRaw');
+    let exportShowJson = <HTMLAnchorElement> document.getElementById('exportShowJson');
+    let exportDownloadJson = <HTMLAnchorElement> document.getElementById('exportDownloadJson');
+    let exportJsonButton = <HTMLButtonElement> document.getElementById('exportJsonButton');
+
+    exportShowJson.addEventListener('click', event => {
+        event.preventDefault();
+        Bootstrap.closeModal('modalExport');
+        
+        jsonRaw.innerHTML = convertModelToJson(models[0].model, true);
+        Highlight.highlight(jsonRaw);
+
+        Bootstrap.openModal('modalJsonRaw');
+    });
+
+    exportDownloadJson.addEventListener('click', event => {
+        event.preventDefault();
+        downloadModelJson(models[0].model);
+    });
+
+    exportJsonButton.addEventListener('click', () => downloadModelJson(models[0].model));
+
+    const jsonRawCopy = <HTMLButtonElement> document.getElementById('jsonRawCopy');
+    jsonRawCopy.addEventListener('click', () => {
+        copyTextToClipboard(convertModelToJson(models[0].model, false));
+        selectElement(jsonRaw);
     });
 }
 

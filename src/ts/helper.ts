@@ -1,5 +1,7 @@
 import { BoxGeometry, Vector2 } from "three";
 import { Cube } from "./data/Cube";
+import { LModel } from "./data/LModel";
+import { convertModelToJson } from "./loader";
 
 export function setCubeUVs(geometry: BoxGeometry, cube: Cube) {
     setUVs(geometry, cube.texture.offsetX, cube.texture.offsetY, cube.dimensions.x, cube.dimensions.y, cube.dimensions.z, cube.texture.width, cube.texture.height);
@@ -93,4 +95,21 @@ export function selectElement(element: HTMLElement) {
 	    range.moveToElementText(element);
 	    range.select();
 	}
+}
+
+export function downloadText(text: string, filename: string) {
+    let element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+  
+    element.style.display = 'none';
+    document.body.appendChild(element);
+  
+    element.click();
+  
+    document.body.removeChild(element);
+}
+
+export function downloadModelJson(model: LModel) {
+	downloadText(convertModelToJson(model, false), `${model.name}.json`);
 }
