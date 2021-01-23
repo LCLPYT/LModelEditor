@@ -11,7 +11,8 @@ export class SceneModel extends Group {
     textureCanvas: HTMLCanvasElement;
     texture: Texture;
     model: LModel;
-    activeObjects: Object3D[] = [];
+    pivotPoints: Object3D[] = [];
+    cubes: Object3D[] = [];
 
     constructor() {
         super();
@@ -59,26 +60,32 @@ export class SceneModel extends Group {
         this.model.renderers.forEach(renderer => this.addRenderer(renderer));
     }
 
-    private addRenderer(renderer: ModelRenderer) {
-        renderer.children.forEach(child => this.addRenderer(child));
-        renderer.cubes.forEach(cube => this.addCube(cube, renderer));
-    
+    private addRenderer(renderer: ModelRenderer, parent: Object3D = null) {
+        const eulerRotation = new Euler(
+            renderer.rotation.x,
+            -renderer.rotation.y,
+            -renderer.rotation.z,
+            'ZYX'
+        );
+
         const rotPoint = new Mesh(new SphereGeometry(0.1, 32, 32), new MeshBasicMaterial({ color: 0xff0000 }));
-        rotPoint.position.copy(this.getPivotPoint(renderer));
-    
-        this.add(rotPoint);
-    }
-
-    protected getMaterialOptions(): MeshStandardMaterialParameters | MeshBasicMaterialParameters {
-        return {
-            map: this.texture,
-            side: DoubleSide,
-            transparent: true,
-            alphaTest: 1e-5
+        rotPoint.userData = {
+            name: renderer.name
         };
+        rotPoint.position.copy(this.getPivotPoint(renderer));
+        rotPoint.setRotationFromEuler(eulerRotation);
+        rotPoint.visible = renderer.visible;
+
+        this.pivotPoints.push(rotPoint);
+
+        renderer.children.forEach(child => this.addRenderer(child, rotPoint));
+        renderer.cubes.forEach(cube => this.addCube(cube, rotPoint));
+    
+        if(parent === null) this.add(rotPoint);
+        else parent.add(rotPoint);
     }
 
-    private addCube(cube: Cube, renderer: ModelRenderer) {
+    private addCube(cube: Cube, parent: Object3D) {
         const geometry = new BoxGeometry(cube.dimensions.x, cube.dimensions.y, cube.dimensions.z);
         setCubeUVs(geometry, cube);
     
@@ -90,30 +97,25 @@ export class SceneModel extends Group {
             (-cube.position.y) - (cube.dimensions.y / 2 + 0.5) + (0.5),
             (-cube.position.z) - (cube.dimensions.z / 2 - 0.5) - (0.5)
         );
+        mesh.userData = {
+            cubeTexture: cube.texture
+        };
     
-        let pivotPoint = this.getPivotPoint(renderer);
-    
-        mesh.position.add(pivotPoint);
-    
-        const eulerRotation = new Euler(
-            renderer.rotation.x,
-            -renderer.rotation.y,
-            -renderer.rotation.z,
-            'ZYX'
-        );
-    
-        mesh.position.sub(pivotPoint);
-        mesh.position.applyEuler(eulerRotation);
-        mesh.position.add(pivotPoint);
-    
-        mesh.setRotationFromEuler(eulerRotation);
-    
-        this.add(mesh);
-        this.activeObjects.push(mesh);
+        parent.add(mesh);
+        this.cubes.push(mesh);
+    }
+
+    protected getMaterialOptions(): MeshStandardMaterialParameters | MeshBasicMaterialParameters {
+        return {
+            map: this.texture,
+            side: DoubleSide,
+            transparent: true,
+            alphaTest: 1e-5
+        };
     }
 
     changeMaterial(standard: boolean) {
-        this.activeObjects.forEach(o => {
+        this.cubes.forEach(o => {
             if(!(o instanceof Mesh)) return;
             let mesh = <Mesh> o;
 
@@ -134,10 +136,79 @@ export class SceneModel extends Group {
     }
 
     clearChildren() {
-        this.activeObjects = [];
+        this.cubes = [];
 
         for (let i = this.children.length - 1; i >= 0; i--) 
             this.remove(this.children[i]);
+    }
+
+    updateModel() {
+        let model = new LModel(this.model.name);
+        model.initialTranslation = this.model.initialTranslation;
+
+        this.children.forEach(pivotPoint => SceneModel.addPivotPoint(pivotPoint, model, model));
+    }
+
+    private static addPivotPoint(pivotPoint: Object3D, model: LModel, parent: LModel | ModelRenderer) {
+        let data = pivotPoint.userData;
+        if(data === undefined || data.name === undefined) return;
+
+        let rotationPoint = new Vector3(
+            +(pivotPoint.position.x - ( model.initialTranslation.x * 16)),
+            -(pivotPoint.position.y - (-model.initialTranslation.y * 16)),
+            -(pivotPoint.position.z - (-model.initialTranslation.z * 16))
+        )
+
+        let rotation = new Euler(
+            pivotPoint.rotation.x,
+            -pivotPoint.rotation.y,
+            -pivotPoint.rotation.z,
+            'XYZ'
+        );
+        rotation.reorder('ZYX');
+
+        let renderer = new ModelRenderer(data.name, rotationPoint, rotation.toVector3(), pivotPoint.visible);
+
+        pivotPoint.children.forEach(renderChild => {
+            let userData = renderChild.userData;
+            if(userData === undefined) return;
+
+            if(userData.name !== undefined) {
+                SceneModel.addPivotPoint(renderChild, model, renderer);
+                return;
+            }
+
+            if(userData.cubeTexture === undefined) return;
+
+            if(!(renderChild instanceof Mesh)) throw new Error(`Unknown conversion from type '${typeof renderChild}'`);
+            let mesh = <Mesh> renderChild;
+            
+            if(!(mesh.geometry instanceof BoxGeometry)) throw new Error(`Unknown geometry type '${typeof mesh.geometry}'`);
+            let geometry = <BoxGeometry> mesh.geometry;
+
+            let dimensions = new Vector3(
+                geometry.parameters.width * mesh.scale.x, 
+                geometry.parameters.height * mesh.scale.y, 
+                geometry.parameters.depth * mesh.scale.z
+            );
+
+            let position = new Vector3(
+                // axis direction   | cube begin to center     | offset correction
+                +((mesh.position.x) - (dimensions.x / 2 - 0.5) - (0.5)),
+                -((mesh.position.y) + (dimensions.y / 2 + 0.5) - (0.5)),
+                -((mesh.position.z) + (dimensions.z / 2 - 0.5) + (0.5))
+            );
+
+            let delta = new Vector3(0, 0, 0); // Still unimplemted
+            let mirror = false; // Still unimplemented
+
+            let cube = new Cube(position, dimensions, delta, mirror, userData.cubeTexture);
+
+            renderer.cubes.push(cube);
+        });
+
+        if(parent instanceof LModel) parent.renderers.push(renderer);
+        else parent.children.push(renderer);
     }
 
 }

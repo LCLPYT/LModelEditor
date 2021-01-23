@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from '../../node_modules/three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from '../../node_modules/three/examples/jsm/controls/TransformControls';
-import { objects, setSelectable, setSelected } from './scene';
+import { objects, setSelectable, setSelected, models } from './scene';
 
 let orbitControls: OrbitControls;
 let transformControls: TransformControls;
@@ -16,6 +16,7 @@ export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, sc
     orbitControls.enableKeys = true;
     orbitControls.minDistance = 1;
     orbitControls.maxDistance = 100;
+    orbitControls.target.set(0, 8, 0);
     orbitControls.update();
 
     transformControls = new TransformControls(camera, canvas);
@@ -25,6 +26,11 @@ export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, sc
 
     rayCaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
+
+    let exportBtn = <HTMLButtonElement> document.getElementById('export-btn');
+    exportBtn.addEventListener('click', () => {
+        models[0].updateModel();
+    });
 
     window.addEventListener('keydown', event => {
         if(event.defaultPrevented) return;

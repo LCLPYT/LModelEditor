@@ -6,7 +6,7 @@ export let scene: THREE.Scene;
 export let camera: THREE.PerspectiveCamera;
 export let objects: THREE.Object3D[] = [];
 let selectedObjects: THREE.Object3D[] = [];
-let models: SceneModel[] = [];
+export let models: SceneModel[] = [];
 
 export const AXIS_X = new THREE.Vector3(1, 0, 0);
 export const AXIS_Y = new THREE.Vector3(0, 1, 0);
@@ -16,7 +16,8 @@ export function initScene() {
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(-2.5, 2, 3.75);
+    camera.position.set(-22.7, 27.7, 33.4);
+    camera.rotation.set(-0.57, -0.5, -0.3);
     scene.add(camera);
 }
 
@@ -53,7 +54,8 @@ function addModel(modelName: string) {
     ]).then(() => {
         sceneModel.init();
         scene.add(sceneModel);
-        objects.push(...sceneModel.activeObjects);
+        objects.push(...sceneModel.cubes);
+        objects.push(...sceneModel.pivotPoints);
     }, error => {
         console.error("Error, some loading promises were rejected.", error);
     }).catch(error => {

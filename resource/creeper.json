@@ -1,7 +1,7 @@
 {
     "name": "creeper",
     "renderers": [{
-        "name": "Entity Part",
+        "name": "head",
         "cubes": [{
             "position": {
                 "x": -4.0,
@@ -39,7 +39,7 @@
         },
         "visible": true
     }, {
-        "name": "Entity Part",
+        "name": "body",
         "cubes": [{
             "position": {
                 "x": -4.0,
@@ -77,7 +77,7 @@
         },
         "visible": true
     }, {
-        "name": "Entity Part",
+        "name": "foot1",
         "cubes": [{
             "position": {
                 "x": -2.0,
@@ -115,7 +115,7 @@
         },
         "visible": true
     }, {
-        "name": "Entity Part",
+        "name": "foot2",
         "cubes": [{
             "position": {
                 "x": -2.0,
@@ -153,7 +153,7 @@
         },
         "visible": true
     }, {
-        "name": "Entity Part",
+        "name": "foot3",
         "cubes": [{
             "position": {
                 "x": -2.0,
@@ -191,7 +191,7 @@
         },
         "visible": true
     }, {
-        "name": "Entity Part",
+        "name": "foot4",
         "cubes": [{
             "position": {
                 "x": -2.0,

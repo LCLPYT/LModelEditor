@@ -4,16 +4,16 @@ import { camera, scene } from './scene';
 import { EffectComposer } from '../../node_modules/three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from '../../node_modules/three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from '../../node_modules/three/examples/jsm/postprocessing/ShaderPass';
-import { OutlinePass } from '../three/OutlinePass';
 import { FXAAShader } from '../../node_modules/three/examples/jsm/shaders/FXAAShader';
 import { Object3D } from 'three';
+import { ChildOutlinePass } from '../three/ChildOutlinePass';
 
 export let renderer: THREE.WebGLRenderer;
 export let canvas: HTMLCanvasElement;
 let composer: EffectComposer;
 let effectFXAA: ShaderPass;
-let outlinePassSelected: OutlinePass;
-let outlinePassSelectable: OutlinePass;
+let outlinePassSelected: ChildOutlinePass;
+let outlinePassSelectable: ChildOutlinePass;
 
 export function initRenderer(scene: THREE.Scene, camera: THREE.Camera) {
     renderer = new THREE.WebGLRenderer({
@@ -29,11 +29,11 @@ export function initRenderer(scene: THREE.Scene, camera: THREE.Camera) {
     const renderPass = new RenderPass(scene, camera);
     composer.addPass(renderPass);
 
-    outlinePassSelected = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
+    outlinePassSelected = new ChildOutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
     outlinePassSelected.visibleEdgeColor = new THREE.Color(0xeb8909);
     composer.addPass(outlinePassSelected);
 
-    outlinePassSelectable = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
+    outlinePassSelectable = new ChildOutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
     outlinePassSelectable.visibleEdgeColor = new THREE.Color(0xdddddd);
     composer.addPass(outlinePassSelectable);
 
