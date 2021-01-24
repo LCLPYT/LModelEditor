@@ -1,6 +1,6 @@
-import { BoxGeometry, DoubleSide, Euler, Group, Mesh, MeshBasicMaterial, MeshBasicMaterialParameters, MeshStandardMaterial, MeshStandardMaterialParameters, NearestFilter, Object3D, Scene, SphereGeometry, Texture, Vector2, Vector3 } from "three";
+import { BoxGeometry, DoubleSide, Euler, Group, Mesh, MeshBasicMaterial, MeshBasicMaterialParameters, MeshStandardMaterial, MeshStandardMaterialParameters, NearestFilter, Object3D, SphereGeometry, Texture, Vector3 } from "three";
 import { setCubeUVs } from "../helper";
-import { fetchJson, isTextureSource, loadSkinToCanvas, loadImage, loadModelFromJson } from "../loader";
+import { fetchJson, isTextureSource, loadImage, loadModelFromJson, loadSkinToCanvas } from "../loader";
 import { RemoteResource, TextureSource } from "../types";
 import { Cube } from "./Cube";
 import { LModel } from "./LModel";
@@ -60,7 +60,7 @@ export class SceneModel extends Group {
         this.model.renderers.forEach(renderer => this.addRenderer(renderer));
     }
 
-    private addRenderer(renderer: ModelRenderer, parent: Object3D = null) {
+    private addRenderer(renderer: ModelRenderer, parent: Object3D | null = null) {
         const eulerRotation = new Euler(
             renderer.rotation.x,
             -renderer.rotation.y,

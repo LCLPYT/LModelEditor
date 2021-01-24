@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { LModel } from './data/LModel';
 import { SceneModel } from './data/SceneModel';
 import { setSelectableObjects, setSelectedObjects } from './render';
 
@@ -6,7 +7,7 @@ export let scene: THREE.Scene;
 export let camera: THREE.PerspectiveCamera;
 export let objects: THREE.Object3D[] = [];
 let selectedObjects: THREE.Object3D[] = [];
-export let models: SceneModel[] = [];
+export let model: SceneModel | null;
 
 export const AXIS_X = new THREE.Vector3(1, 0, 0);
 export const AXIS_Y = new THREE.Vector3(0, 1, 0);
@@ -42,15 +43,27 @@ export function populateScene() {
     scene.add(new THREE.GridHelper(16, 16, 0x888888, 0x444444));
 
     // addModel('boat');
-    addModel('creeper');
+    loadModel('creeper');
 }
 
-function addModel(modelName: string) {
+export function loadModel(modelName: string | LModel) {
     const sceneModel = new SceneModel();
 
+    let modelPromise: Promise<LModel>;
+    let texturePromise: Promise<THREE.Texture>;
+
+    if(typeof modelName === 'string') {
+        modelPromise = sceneModel.loadModel(`resource/${modelName}.json`);
+        texturePromise = sceneModel.loadTexture(`resource/${modelName}.png`);
+    }
+    else if(modelName instanceof LModel) {
+        modelPromise = sceneModel.loadModel(modelName);
+        texturePromise = sceneModel.loadTexture('resource/missing.png');
+    } else throw new Error('Unimplemented.');
+
     Promise.all([
-        sceneModel.loadModel(`resource/${modelName}.json`),
-        sceneModel.loadTexture(`resource/${modelName}.png`)
+        modelPromise,
+        texturePromise
     ]).then(() => {
         sceneModel.init();
         scene.add(sceneModel);
@@ -62,21 +75,30 @@ function addModel(modelName: string) {
         console.error("Error loading model: ", error)
     });
 
-    models.push(sceneModel);
+    model = sceneModel;
+}
+
+export function removeModel() {
+    if(model === null) return;
+
+    scene.remove(model);
+    objects = [];
+
+    model = null;
 }
 
 export function changeMaterial(standard: boolean) {
-    models.forEach(model => model.changeMaterial(standard));
+    if(model !== null) model.changeMaterial(standard);
 }
 
-export function setSelected(obj: THREE.Object3D, reset: boolean) {
+export function setSelected(obj: THREE.Object3D | null, reset: boolean) {
     if(reset) selectedObjects = [];
-    if(obj != null) selectedObjects.push(obj);
+    if(obj !== null) selectedObjects.push(obj);
     setSelectedObjects(selectedObjects);
 }
 
-export function setSelectable(obj: THREE.Object3D, reset: boolean) {
+export function setSelectable(obj: THREE.Object3D | null, reset: boolean) {
     if(reset) selectedObjects = [];
-    if(obj != null) selectedObjects.push(obj);
+    if(obj !== null) selectedObjects.push(obj);
     setSelectableObjects(selectedObjects);
 }

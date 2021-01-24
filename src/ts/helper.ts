@@ -81,7 +81,8 @@ export function selectElement(element: HTMLElement) {
 	if(!element) return;
 
     if (window.getSelection) {
-        const selection = window.getSelection();
+		const selection = window.getSelection();
+		if(selection === null) throw new Error("window selection unsupported.");
         const range = document.createRange();
         range.selectNodeContents(element);
         selection.removeAllRanges();

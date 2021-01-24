@@ -58,7 +58,7 @@ export function render() {
 }
 
 export function setSelectedObjects(objects: Object3D[]) {
-    let toRemove = [];
+    let toRemove: number[] = [];
     outlinePassSelectable.selectedObjects.forEach(o => {
         let idx = objects.indexOf(o);
         if(idx != -1) toRemove.push(idx);
@@ -69,7 +69,7 @@ export function setSelectedObjects(objects: Object3D[]) {
 }
 
 export function setSelectableObjects(objects: Object3D[]) {
-    let toRemove = [];
+    let toRemove: number[] = [];
     outlinePassSelected.selectedObjects.forEach(o => {
         let idx = objects.indexOf(o);
         if(idx != -1) toRemove.push(idx);

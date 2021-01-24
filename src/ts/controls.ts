@@ -3,15 +3,15 @@ import { OrbitControls } from '../../node_modules/three/examples/jsm/controls/Or
 import { TransformControls } from '../../node_modules/three/examples/jsm/controls/TransformControls';
 import { Bootstrap } from '../js/bootstrap';
 import { Highlight } from '../js/Highlight';
-import { copyTextToClipboard, downloadModelJson, downloadText, selectElement } from './helper';
-import { convertModelToJson } from './loader';
-import { objects, setSelectable, setSelected, models } from './scene';
+import { copyTextToClipboard, downloadModelJson, selectElement } from './helper';
+import { convertModelToJson, loadModel } from './loader';
+import { objects, setSelectable, setSelected, model, removeModel, loadModel as addModel } from './scene';
 
 let orbitControls: OrbitControls;
 let transformControls: TransformControls;
 let rayCaster: THREE.Raycaster;
 let mouse: THREE.Vector2;
-let objectsTransformControl = [];
+let objectsTransformControl: THREE.Object3D[] = [];
 let mouseDownPointer: THREE.Vector2 = new THREE.Vector2(0, 0);
 
 export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, scene: THREE.Scene) {
@@ -36,23 +36,23 @@ export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, sc
     window.addEventListener('keydown', event => {
         if(event.defaultPrevented) return;
 
-        let code = undefined;
+        let code: string | number | undefined = undefined;
         if(event.key !== undefined) code = event.key;
         else if(event.code !== undefined) code = event.code;
         else if(event.keyCode !== undefined) code = event.keyCode;
         // console.log(event.key, event.code, event.keyCode);
 
-        if(handleKeyDown(code)) event.preventDefault();
+        if(code !== undefined && handleKeyDown(code)) event.preventDefault();
     }, true);
     window.addEventListener('keyup', event => {
         if(event.defaultPrevented) return;
 
-        let code = undefined;
+        let code: string | number | undefined = undefined;
         if(event.key !== undefined) code = event.key;
         else if(event.code !== undefined) code = event.code;
         else if(event.keyCode !== undefined) code = event.keyCode;
 
-        if(handleKeyUp(code)) event.preventDefault();
+        if(code !== undefined && handleKeyUp(code)) event.preventDefault();
     });
     window.addEventListener('pointermove', event => {
         if(event.isPrimary === false) return;
@@ -75,22 +75,36 @@ export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, sc
 }
 
 function registerUIListeners() {
-    let exportBtn = <HTMLButtonElement> document.getElementById('export-btn');
+    const uploadError = <HTMLElement> document.getElementById('uploadError');
+
+    const importBtn = <HTMLButtonElement> document.getElementById('import-btn');
+    importBtn.addEventListener('click', () => {
+        if (confirm('Are you sure? The current model will be lost!')) {
+            uploadError.hidden = true;
+            Bootstrap.openModal('modalUpload');
+        }
+    });
+
+    const exportBtn = <HTMLButtonElement> document.getElementById('export-btn');
     exportBtn.addEventListener('click', () => {
-        models[0].updateModel();
+        if(model === null) return;
+
+        model.updateModel();
         Bootstrap.openModal('modalExport');
     });
 
     const jsonRaw = <HTMLElement> document.getElementById('jsonRaw');
-    let exportShowJson = <HTMLAnchorElement> document.getElementById('exportShowJson');
-    let exportDownloadJson = <HTMLAnchorElement> document.getElementById('exportDownloadJson');
-    let exportJsonButton = <HTMLButtonElement> document.getElementById('exportJsonButton');
+    const exportShowJson = <HTMLAnchorElement> document.getElementById('exportShowJson');
+    const exportDownloadJson = <HTMLAnchorElement> document.getElementById('exportDownloadJson');
+    const exportJsonButton = <HTMLButtonElement> document.getElementById('exportJsonButton');
 
     exportShowJson.addEventListener('click', event => {
         event.preventDefault();
         Bootstrap.closeModal('modalExport');
+
+        if(model === null) return;
         
-        jsonRaw.innerHTML = convertModelToJson(models[0].model, true);
+        jsonRaw.innerHTML = convertModelToJson(model.model, true);
         Highlight.highlight(jsonRaw);
 
         Bootstrap.openModal('modalJsonRaw');
@@ -98,15 +112,45 @@ function registerUIListeners() {
 
     exportDownloadJson.addEventListener('click', event => {
         event.preventDefault();
-        downloadModelJson(models[0].model);
+
+        if(model !== null) downloadModelJson(model.model);
     });
 
-    exportJsonButton.addEventListener('click', () => downloadModelJson(models[0].model));
+    exportJsonButton.addEventListener('click', () => {
+        if(model !== null) downloadModelJson(model.model);
+    });
 
     const jsonRawCopy = <HTMLButtonElement> document.getElementById('jsonRawCopy');
     jsonRawCopy.addEventListener('click', () => {
-        copyTextToClipboard(convertModelToJson(models[0].model, false));
+        if(model === null) return;
+
+        copyTextToClipboard(convertModelToJson(model.model, false));
         selectElement(jsonRaw);
+    });
+
+    const fileInput = <HTMLInputElement> document.getElementById('fileInput');
+    fileInput.addEventListener('change', event => {
+        const fileList = (<HTMLInputElement> event.target).files;
+        if(fileList === undefined || fileList === null || fileList.length <= 0) return;
+
+        const file = fileList[0];
+        if(file.type !== "application/json") {
+            uploadError.innerHTML = 'Please select a valid .json file.';
+            uploadError.hidden = false;
+        } else {
+            uploadError.hidden = true;
+
+            loadModel(file, (model, error) => {
+                if(!model) {
+                    uploadError.innerHTML = error === null ? "Unknown error" : error;
+                    uploadError.hidden = false;
+                } else {
+                    Bootstrap.closeModal('modalUpload');
+                    removeModel();
+                    addModel(model);
+                }
+            });
+        }
     });
 }
 
@@ -164,7 +208,6 @@ function handleKeyDown(code: string|number): boolean {
 }
 
 function handleKeyUp(code: string|number): boolean {
-    if(code === undefined) return false;
     if(code === "Shift" || code === "ShiftLeft" || code === 16) {
         transformControls.setTranslationSnap(null);
         transformControls.setRotationSnap(null);
