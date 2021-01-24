@@ -58,7 +58,8 @@ export function loadModel(modelName: string | LModel) {
     }
     else if(modelName instanceof LModel) {
         modelPromise = sceneModel.loadModel(modelName);
-        texturePromise = sceneModel.loadTexture('resource/missing.png');
+        if (modelName.texture !== undefined && modelName.texture !== null) texturePromise = sceneModel.loadTexture(modelName.texture);
+        else texturePromise = sceneModel.loadTexture('resource/missing.png');
     } else throw new Error('Unimplemented.');
 
     Promise.all([

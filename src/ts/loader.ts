@@ -100,3 +100,17 @@ export function loadModel(file: File, callback: (model: LModel | null, error: st
     });
     reader.readAsText(file);
 }
+
+export function loadTextureFromUpload(file: File, res: (data: string) => void) {
+    const reader = new FileReader();
+    reader.addEventListener('load', event => {
+        let target = event.target;
+        if(target === null) return;
+
+        let result = target.result;
+        if(typeof result !== 'string') throw new Error(`Unhandled type '${typeof result}'`);
+
+        res(result);
+    });
+    reader.readAsDataURL(file);
+}

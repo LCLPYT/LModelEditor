@@ -4,8 +4,8 @@ import { TransformControls } from '../../node_modules/three/examples/jsm/control
 import { Bootstrap } from '../js/bootstrap';
 import { Highlight } from '../js/Highlight';
 import { copyTextToClipboard, downloadModelJson, selectElement } from './helper';
-import { convertModelToJson, loadModel } from './loader';
-import { objects, setSelectable, setSelected, model, removeModel, loadModel as addModel } from './scene';
+import { convertModelToJson, loadModel, loadTextureFromUpload } from './loader';
+import { objects, setSelectable, setSelected, model as sceneModel, removeModel, loadModel as addModel } from './scene';
 
 let orbitControls: OrbitControls;
 let transformControls: TransformControls;
@@ -75,21 +75,23 @@ export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, sc
 }
 
 function registerUIListeners() {
-    const uploadError = <HTMLElement> document.getElementById('uploadError');
+    const uploadModelError = <HTMLElement> document.getElementById('uploadModelError');
+    const uploadTextureError = <HTMLElement> document.getElementById('uploadTextureError');
+    const uploadTextureNotice = <HTMLElement> document.getElementById('uploadTextureNotice');
 
     const importBtn = <HTMLButtonElement> document.getElementById('import-btn');
     importBtn.addEventListener('click', () => {
         if (confirm('Are you sure? The current model will be lost!')) {
-            uploadError.hidden = true;
+            uploadModelError.hidden = true;
             Bootstrap.openModal('modalUpload');
         }
     });
 
     const exportBtn = <HTMLButtonElement> document.getElementById('export-btn');
     exportBtn.addEventListener('click', () => {
-        if(model === null) return;
+        if(sceneModel === null) return;
 
-        model.updateModel();
+        sceneModel.updateModel();
         Bootstrap.openModal('modalExport');
     });
 
@@ -102,9 +104,9 @@ function registerUIListeners() {
         event.preventDefault();
         Bootstrap.closeModal('modalExport');
 
-        if(model === null) return;
+        if(sceneModel === null) return;
         
-        jsonRaw.innerHTML = convertModelToJson(model.model, true);
+        jsonRaw.innerHTML = convertModelToJson(sceneModel.model, true);
         Highlight.highlight(jsonRaw);
 
         Bootstrap.openModal('modalJsonRaw');
@@ -113,42 +115,69 @@ function registerUIListeners() {
     exportDownloadJson.addEventListener('click', event => {
         event.preventDefault();
 
-        if(model !== null) downloadModelJson(model.model);
+        if(sceneModel !== null) downloadModelJson(sceneModel.model);
     });
 
     exportJsonButton.addEventListener('click', () => {
-        if(model !== null) downloadModelJson(model.model);
+        if(sceneModel !== null) downloadModelJson(sceneModel.model);
     });
 
     const jsonRawCopy = <HTMLButtonElement> document.getElementById('jsonRawCopy');
     jsonRawCopy.addEventListener('click', () => {
-        if(model === null) return;
+        if(sceneModel === null) return;
 
-        copyTextToClipboard(convertModelToJson(model.model, false));
+        copyTextToClipboard(convertModelToJson(sceneModel.model, false));
         selectElement(jsonRaw);
     });
 
-    const fileInput = <HTMLInputElement> document.getElementById('fileInput');
-    fileInput.addEventListener('change', event => {
+    const modelInput = <HTMLInputElement> document.getElementById('modelInput');
+    modelInput.addEventListener('change', event => {
         const fileList = (<HTMLInputElement> event.target).files;
         if(fileList === undefined || fileList === null || fileList.length <= 0) return;
 
         const file = fileList[0];
         if(file.type !== "application/json") {
-            uploadError.innerHTML = 'Please select a valid .json file.';
-            uploadError.hidden = false;
+            uploadModelError.innerHTML = 'Please select a valid .json file.';
+            uploadModelError.hidden = false;
         } else {
-            uploadError.hidden = true;
+            uploadModelError.hidden = true;
 
             loadModel(file, (model, error) => {
                 if(!model) {
-                    uploadError.innerHTML = error === null ? "Unknown error" : error;
-                    uploadError.hidden = false;
+                    uploadModelError.innerHTML = error === null ? "Unknown error" : error;
+                    uploadModelError.hidden = false;
                 } else {
                     Bootstrap.closeModal('modalUpload');
                     removeModel();
                     addModel(model);
+
+                    if(model.texture === undefined || model.texture === null) {
+                        uploadTextureNotice.hidden = false;
+                        Bootstrap.openModal('modalUploadTexture');
+                    }
                 }
+            });
+        }
+    });
+
+    const textureInput = <HTMLInputElement> document.getElementById('textureInput');
+    textureInput.addEventListener('change', event => {
+        const fileList = (<HTMLInputElement> event.target).files;
+        if(fileList === undefined || fileList === null || fileList.length <= 0) return;
+
+        const file = fileList[0];
+        if(!file.type.startsWith("image/")) {
+            uploadTextureError.innerHTML = 'Please select a valid image file.';
+            uploadTextureError.hidden = false;
+        } else {
+            uploadTextureError.hidden = true;
+
+            loadTextureFromUpload(file, data => {
+                if(sceneModel === null) throw new Error("No model loaded.");
+
+                sceneModel.loadTexture(data).then(() => {
+                    Bootstrap.closeModal('modalUploadTexture');
+                });
             });
         }
     });

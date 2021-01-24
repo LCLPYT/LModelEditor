@@ -147,6 +147,10 @@ export class SceneModel extends Group {
         model.initialTranslation = this.model.initialTranslation;
 
         this.children.forEach(pivotPoint => SceneModel.addPivotPoint(pivotPoint, model, model));
+
+        model.texture = this.textureCanvas.toDataURL();
+
+        this.model = model;
     }
 
     private static addPivotPoint(pivotPoint: Object3D, model: LModel, parent: LModel | ModelRenderer) {

@@ -94,14 +94,52 @@
             <h4>Select your file</h4>
             <p>Please select a valid file. Currently, only &nbsp;<code>LModel JSON</code>&nbsp; files are supported.</p>
             <br>
-            <div class="alert alert-danger" role="alert" id="uploadError" hidden></div>
+            <div class="alert alert-danger" role="alert" id="uploadModelError" hidden></div>
             <div class="input-group">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="fileInputLabel">Upload</span>
+                <span class="input-group-text" id="modelInputLabel">Upload</span>
               </div>
               <div class="custom-file">
-                <input type="file" class="custom-file-input" id="fileInput" aria-describedby="fileInputLabel" accept=".json">
-                <label class="custom-file-label" for="fileInput">Choose file...</label>
+                <input type="file" class="custom-file-input" id="modelInput" aria-describedby="modelInputLabel" accept=".json">
+                <label class="custom-file-label" for="modelInput">Choose file...</label>
+              </div>
+            </div>
+            <br>
+            &nbsp;&nbsp;<small>You may also drop valid files anywhere on the page.</small>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Texture Upload -->
+  <div class="modal fade" id="modalUploadTexture" tabindex="-1" role="dialog" aria-labelledby="modalUploadTextureLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalUploadTextureLabel">Import Texture</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-warning" role="alert" id="uploadTextureNotice" hidden>
+            The imported model does not contain a texture. Unless you upload a texture, a placeholder texture will be displayed.
+          </div>
+          <p>
+            <h4>Select your file</h4>
+            <p>
+              Please select a valid texture file. Supported file types: <b>PNG</b>, <b>JPEG</b>, <b>GIF</b>, <b>BMP</b>.
+            </p>
+            <br>
+            <div class="alert alert-danger" role="alert" id="uploadTextureError" hidden></div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="textureInputLabel">Upload Texture</span>
+              </div>
+              <div class="custom-file">
+                <input type="file" class="custom-file-input" id="textureInput" aria-describedby="textureInputLabel" accept="image/*">
+                <label class="custom-file-label" for="textureInput">Choose file...</label>
               </div>
             </div>
             <br>

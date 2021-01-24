@@ -57,7 +57,8 @@ const modelSchema = {
     properties: {
         name: {type: 'string'},
         initialTranslation: {$ref: '#/definitions/vec3d'},
-        renderers: {$ref: '#/definitions/modelRenderers'}
+        renderers: {$ref: '#/definitions/modelRenderers'},
+        texture: {type: 'string'}
     },
     required: ['name', 'initialTranslation', 'renderers'],
     additionalProperties: false,
