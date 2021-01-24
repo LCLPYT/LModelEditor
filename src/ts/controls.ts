@@ -74,10 +74,11 @@ export function initControls(canvas: HTMLCanvasElement, camera: THREE.Camera, sc
     });
 }
 
+const uploadModelError = <HTMLElement> document.getElementById('uploadModelError');
+const uploadTextureError = <HTMLElement> document.getElementById('uploadTextureError');
+const uploadTextureNotice = <HTMLElement> document.getElementById('uploadTextureNotice');
+
 function registerUIListeners() {
-    const uploadModelError = <HTMLElement> document.getElementById('uploadModelError');
-    const uploadTextureError = <HTMLElement> document.getElementById('uploadTextureError');
-    const uploadTextureNotice = <HTMLElement> document.getElementById('uploadTextureNotice');
 
     const importBtn = <HTMLButtonElement> document.getElementById('import-btn');
     importBtn.addEventListener('click', () => {
@@ -140,23 +141,7 @@ function registerUIListeners() {
             uploadModelError.innerHTML = 'Please select a valid .json file.';
             uploadModelError.hidden = false;
         } else {
-            uploadModelError.hidden = true;
-
-            loadModel(file, (model, error) => {
-                if(!model) {
-                    uploadModelError.innerHTML = error === null ? "Unknown error" : error;
-                    uploadModelError.hidden = false;
-                } else {
-                    Bootstrap.closeModal('modalUpload');
-                    removeModel();
-                    addModel(model);
-
-                    if(model.texture === undefined || model.texture === null) {
-                        uploadTextureNotice.hidden = false;
-                        Bootstrap.openModal('modalUploadTexture');
-                    }
-                }
-            });
+            tryUploadModel(file, false);
         }
     });
 
@@ -170,16 +155,69 @@ function registerUIListeners() {
             uploadTextureError.innerHTML = 'Please select a valid image file.';
             uploadTextureError.hidden = false;
         } else {
-            uploadTextureError.hidden = true;
-
-            loadTextureFromUpload(file, data => {
-                if(sceneModel === null) throw new Error("No model loaded.");
-
-                sceneModel.loadTexture(data).then(() => {
-                    Bootstrap.closeModal('modalUploadTexture');
-                });
-            });
+            tryUploadTexture(file, false);
         }
+    });
+
+    document.body.addEventListener('dragover', event => {
+        event.stopPropagation();
+        event.preventDefault();
+
+        if(event.dataTransfer === null) return;
+        event.dataTransfer.dropEffect = 'copy';
+    });
+
+    document.body.addEventListener('drop', event => {
+        event.stopPropagation();
+        event.preventDefault();
+
+        if(event.dataTransfer === null) return;
+
+        const fileList = event.dataTransfer.files;
+        if(fileList.length <= 0) return;
+
+        const file = fileList[0];
+        if(file.type === 'application/json') {
+            tryUploadModel(file, true);
+        }
+        else if(file.type.startsWith('image/')) {
+            tryUploadTexture(file, true);
+        }
+    });
+}
+
+function tryUploadModel(file: File, dropped: boolean) {
+    uploadModelError.hidden = true;
+
+    loadModel(file, (model, error) => {
+        if(!model) {
+            if(dropped) Bootstrap.openModal('modalUpload');
+
+            uploadModelError.innerHTML = error === null ? "Unknown error" : error;
+            uploadModelError.hidden = false;
+        } else {
+            Bootstrap.closeModal('modalUpload');
+            removeModel();
+            addModel(model);
+
+            if(model.texture === undefined || model.texture === null) {
+                uploadTextureNotice.hidden = false;
+                Bootstrap.openModal('modalUploadTexture');
+            }
+        }
+    });
+}
+
+function tryUploadTexture(file: File, dropped: boolean) {
+    uploadTextureError.hidden = true;
+
+    loadTextureFromUpload(file, data => {
+        if(sceneModel === null) throw new Error("No model loaded.");
+
+        sceneModel.loadTexture(data).then(() => {
+            Bootstrap.closeModal('modalUploadTexture');
+            uploadTextureNotice.hidden = true;
+        });
     });
 }
 
