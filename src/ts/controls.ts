@@ -155,7 +155,7 @@ function registerUIListeners() {
             uploadTextureError.innerHTML = 'Please select a valid image file.';
             uploadTextureError.hidden = false;
         } else {
-            tryUploadTexture(file, false);
+            tryUploadTexture(file);
         }
     });
 
@@ -181,7 +181,7 @@ function registerUIListeners() {
             tryUploadModel(file, true);
         }
         else if(file.type.startsWith('image/')) {
-            tryUploadTexture(file, true);
+            tryUploadTexture(file);
         }
     });
 }
@@ -208,7 +208,7 @@ function tryUploadModel(file: File, dropped: boolean) {
     });
 }
 
-function tryUploadTexture(file: File, dropped: boolean) {
+function tryUploadTexture(file: File) {
     uploadTextureError.hidden = true;
 
     loadTextureFromUpload(file, data => {
